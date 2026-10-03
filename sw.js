@@ -3,7 +3,7 @@
    PWA - ADMINISTRACIÓN
 ========================================================= */
 
-const CACHE_NAME = "dl-luxury-admin-v3";
+const CACHE_NAME = "dl-luxury-admin-v4";
 
 const ARCHIVOS = [
     "./",
@@ -14,15 +14,7 @@ const ARCHIVOS = [
     "./adonvent.js",
     "./pedidos-admin.js",
     "./anos.js",
-    "./manifest.json",
-
-    /* ICONOS PWA */
-    "./luxurylogo-192.png",
-    "./luxurylogo-512.png",
-
-    /* CAPTURAS PWA */
-    "./screenshot-mobile.png",
-    "./screenshot-desktop.png"
+    "./manifest.json"
 ];
 
 
@@ -32,7 +24,7 @@ const ARCHIVOS = [
 
 self.addEventListener("install", event => {
 
-    console.log("DL Luxury SW: instalando versión:", CACHE_NAME);
+    console.log("DL Luxury SW: instalando...");
 
     event.waitUntil(
 
@@ -61,11 +53,9 @@ self.addEventListener("install", event => {
             .catch(error => {
 
                 console.error(
-                    "DL Luxury SW: error al guardar archivos:",
+                    "DL Luxury SW: error al instalar:",
                     error
                 );
-
-                throw error;
 
             })
 
@@ -80,10 +70,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
 
-    console.log(
-        "DL Luxury SW: activando versión:",
-        CACHE_NAME
-    );
+    console.log("DL Luxury SW: activando...");
 
     event.waitUntil(
 
@@ -117,7 +104,7 @@ self.addEventListener("activate", event => {
             .then(() => {
 
                 console.log(
-                    "DL Luxury SW: caché actualizada."
+                    "DL Luxury SW: caché actualizada correctamente."
                 );
 
                 return self.clients.claim();
@@ -135,10 +122,6 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
 
-    /* -----------------------------------------------
-       Solo GET
-    ------------------------------------------------ */
-
     if (event.request.method !== "GET") {
         return;
     }
@@ -151,12 +134,8 @@ self.addEventListener("fetch", event => {
        NO CACHEAR SUPABASE
     ===================================================== */
 
-    if (
-        url.hostname.includes("supabase.co")
-    ) {
-
+    if (url.hostname.includes("supabase.co")) {
         return;
-
     }
 
 
@@ -166,20 +145,15 @@ self.addEventListener("fetch", event => {
 
     if (
         url.hostname.includes("cdnjs.cloudflare.com") ||
-        url.hostname.includes("jsdelivr.net") ||
-        url.hostname.includes("fonts.googleapis.com") ||
-        url.hostname.includes("fonts.gstatic.com")
+        url.hostname.includes("jsdelivr.net")
     ) {
-
         return;
-
     }
 
 
     /* =====================================================
        NAVEGACIÓN / HTML
-       
-       SIEMPRE INTENTAR RED PRIMERO
+       RED PRIMERO
     ===================================================== */
 
     if (
@@ -194,21 +168,11 @@ self.addEventListener("fetch", event => {
 
                 .then(response => {
 
-                    /*
-                     * Si la respuesta es válida,
-                     * devolver directamente la versión nueva.
-                     */
-
                     return response;
 
                 })
 
                 .catch(() => {
-
-                    /*
-                     * Si no hay internet,
-                     * utilizar la versión almacenada.
-                     */
 
                     return caches.match(event.request);
 
@@ -223,7 +187,6 @@ self.addEventListener("fetch", event => {
 
     /* =====================================================
        ARCHIVOS LOCALES
-       
        CACHE FIRST
     ===================================================== */
 
@@ -244,41 +207,19 @@ self.addEventListener("fetch", event => {
 
                     .then(response => {
 
-                        /*
-                         * No guardar respuestas inválidas.
-                         */
-
-                        if (
-                            !response ||
-                            response.status !== 200 ||
-                            response.type === "opaque"
-                        ) {
-
-                            return response;
-
-                        }
-
-
-                        /*
-                         * Guardar una copia de los archivos
-                         * locales que se soliciten.
-                         */
-
-                        const copia = response.clone();
-
-                        caches.open(CACHE_NAME)
-
-                            .then(cache => {
-
-                                cache.put(
-                                    event.request,
-                                    copia
-                                );
-
-                            });
-
-
                         return response;
+
+                    })
+
+                    .catch(() => {
+
+                        return new Response(
+                            "",
+                            {
+                                status: 503,
+                                statusText: "Archivo no disponible"
+                            }
+                        );
 
                     });
 
