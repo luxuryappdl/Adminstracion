@@ -55,7 +55,7 @@ function obtenerBotonInstalarPWA() {
 
 
 /* =========================================================
-   MOSTRAR BOTÓN
+   PREPARAR BOTÓN
 ========================================================= */
 
 document.addEventListener(
@@ -70,13 +70,21 @@ document.addEventListener(
             botonInstalarPWA
         ) {
 
-            botonInstalarPWA.classList.add(
+            /*
+               IMPORTANTE:
+
+               El botón permanece oculto
+               hasta que el navegador confirme
+               que la PWA puede instalarse.
+            */
+
+            botonInstalarPWA.classList.remove(
                 "visible"
             );
 
 
             console.log(
-                "✅ Botón de instalación encontrado."
+                "✅ Botón de instalación preparado."
             );
 
 
@@ -111,8 +119,32 @@ window.addEventListener(
         evento.preventDefault();
 
 
+        /*
+           Guardar el evento para utilizarlo
+           cuando el usuario presione el botón.
+        */
+
         deferredPrompt =
             evento;
+
+
+        /*
+           Ahora sí mostramos el botón.
+        */
+
+        const botonInstalarPWA =
+            obtenerBotonInstalarPWA();
+
+
+        if (
+            botonInstalarPWA
+        ) {
+
+            botonInstalarPWA.classList.add(
+                "visible"
+            );
+        }
+
     }
 );
 
@@ -136,18 +168,16 @@ document.addEventListener(
         }
 
 
-        /*
-           Si Chrome todavía no permite
-           la instalación.
-        */
+        /* =================================================
+           COMPROBAR SI CHROME PERMITE INSTALAR
+        ================================================= */
 
         if (
             !deferredPrompt
         ) {
 
-            alert(
-                "La instalación de DL Luxury todavía no está disponible. " +
-                "Verifica que estés usando Chrome o Edge y que la PWA esté correctamente configurada."
+            console.log(
+                "ℹ️ La instalación todavía no está disponible."
             );
 
 
@@ -158,11 +188,16 @@ document.addEventListener(
         try {
 
             /*
-               Mostrar ventana de instalación.
+               Mostrar ventana nativa
+               de instalación.
             */
 
             await deferredPrompt.prompt();
 
+
+            /*
+               Esperar respuesta del usuario.
+            */
 
             const resultado =
                 await deferredPrompt.userChoice;
@@ -184,8 +219,23 @@ document.addEventListener(
 
         } finally {
 
+            /*
+               El evento solamente puede
+               utilizarse una vez.
+            */
+
             deferredPrompt =
                 null;
+
+
+            /*
+               Ocultar botón hasta que
+               vuelva a estar disponible.
+            */
+
+            boton.classList.remove(
+                "visible"
+            );
         }
 
     }
