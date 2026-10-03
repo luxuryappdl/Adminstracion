@@ -8,18 +8,33 @@
     "background_color": "#000000",
     "theme_color": "#000000",
     "orientation": "portrait",
+
     "icons": [
         {
             "src": "./luxurylogo.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any"
+            "purpose": "any maskable"
         },
         {
             "src": "./luxurylogo.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any"
+            "purpose": "any maskable"
+        }
+    ],
+
+    "screenshots": [
+        {
+            "src": "./screenshot-mobile.png",
+            "sizes": "1080x1920",
+            "type": "image/png"
+        },
+        {
+            "src": "./screenshot-desktop.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide"
         }
     ]
 }
